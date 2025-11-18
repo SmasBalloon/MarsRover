@@ -1,130 +1,67 @@
 import java.util.ArrayList;
 
 public class Rover {
-	Orientation orientation = Orientation.NORTH;
-	private Integer positionX = 0;
-	private Integer positionY = 0;
-	
+    Orientation orientation = Orientation.NORTH;
+    private Integer positionX = 0;
+    private Integer positionY = 0;
+    
+    // Stratégies de mouvement et rotation (Open/Closed Principle)
+    private final MovementStrategy forwardMovement = new ForwardMovement();
+    private final MovementStrategy backwardMovement = new BackwardMovement();
+    private final RotationStrategy leftRotation = new LeftRotation();
+    private final RotationStrategy rightRotation = new RightRotation();
+    private final GridWrapper gridWrapper = new GridWrapper();
 
-    public void forward(ArrayList<Obstacle> obstacles){
-    	Boolean isValid = true;
-        System.out.println("Le Rover avance !");
-        if (this.orientation == Orientation.NORTH) {
-        	isValid = isValid(obstacles, isValid, getPositionX(), getPositionY() + 1);
-        	if (isValid) {
-        		this.positionY++;
-        	} else {
-        		System.out.println("je ne peut pas avancé");
-        	}
-        } else if (this.orientation == Orientation.SOUTH) {
-        	isValid = isValid(obstacles, isValid, getPositionX(), getPositionY() - 1);
-        	if (isValid) {
-        		this.positionY--;
-        	} else System.out.println("je ne peut pas avancé");
+    public void forward(ArrayList<Obstacle> obstacles) {
+        move(obstacles, forwardMovement, "Le Rover avance !");
+    }
 
-        } else if (this.orientation == Orientation.EAST) {
-        	isValid = isValid(obstacles, isValid, getPositionX() + 1, getPositionY());
-        	if (isValid) {
-        		this.positionX++;
-        	} else System.out.println("je ne peut pas avancé");
+    public void backward(ArrayList<Obstacle> obstacles) {
+        move(obstacles, backwardMovement, "Le Rover avance !");
+    }
 
-        } else if (this.orientation == Orientation.WEST) {
-        	isValid = isValid(obstacles, isValid, getPositionX() - 1 , getPositionY());
-        	if (isValid) {
-        		this.positionX--;
-        	} else System.out.println("je ne peut pas avancé");
+    // Méthode privée qui respecte Single Responsibility
+    private void move(ArrayList<Obstacle> obstacles, MovementStrategy strategy, String message) {
+        System.out.println(message);
+        Position currentPosition = new Position(positionX, positionY);
+        Position newPosition = strategy.calculateNewPosition(currentPosition, orientation);
+        
+        ObstacleDetector detector = new ObstacleDetector(obstacles);
+        if (detector.isPositionBlocked(newPosition)) {
+            System.out.println("je ne peut pas avancé");
+            return;
         }
+        
+        this.positionX = newPosition.getX();
+        this.positionY = newPosition.getY();
         this.isOnTheEdge();
     }
 
-    public void backward(ArrayList<Obstacle> obstacles){
-    	Boolean isValid = true;
-        System.out.println("Le Rover avance !");
-        if (this.orientation == Orientation.NORTH) {
-        	isValid = isValid(obstacles, isValid, getPositionX(), getPositionY() - 1);
-        	if (isValid) {
-        		this.positionY--;
-        	} else System.out.println("je ne peut pas avancé");
-
-        } else if (this.orientation == Orientation.SOUTH) {
-        	isValid = isValid(obstacles, isValid, getPositionX(), getPositionY() + 1);
-        	if (isValid) {
-        		this.positionY++;
-        	} else System.out.println("je ne peut pas avancé");
-
-        } else if (this.orientation == Orientation.EAST) {
-        	isValid = isValid(obstacles, isValid, getPositionX() - 1, getPositionY());
-        	if (isValid) {
-        		this.positionX--;
-        	} else System.out.println("je ne peut pas avancé");
-
-        } else if (this.orientation == Orientation.WEST) {
-        	isValid = isValid(obstacles, isValid, getPositionX() + 1, getPositionY());
-        	if (isValid) {
-        		this.positionX++;
-        	} else System.out.println("je ne peut pas avancé");
-        }
-        this.isOnTheEdge();
-    }
-
-    public void left(){
+    public void left() {
         System.out.println("Le joueur tourne à gauche !");
-        if (this.orientation == Orientation.NORTH) {
-        	this.orientation = Orientation.WEST;
-        } else if (this.orientation == Orientation.SOUTH) {
-        	this.orientation = Orientation.EAST;
-        } else if (this.orientation == Orientation.EAST) {
-        	this.orientation = Orientation.NORTH;
-        } else if (this.orientation == Orientation.WEST) {
-        	this.orientation = Orientation.SOUTH;
-        }
+        this.orientation = leftRotation.rotate(orientation);
     }
 
-    public void right(){
+    public void right() {
         System.out.println("Le joueur tourne à doite !");
-        if (this.orientation == Orientation.NORTH) {
-        	this.orientation = Orientation.EAST;
-        } else if (this.orientation == Orientation.SOUTH) {
-        	this.orientation = Orientation.WEST;
-        } else if (this.orientation == Orientation.EAST) {
-        	this.orientation = Orientation.SOUTH;
-        } else if (this.orientation == Orientation.WEST) {
-        	this.orientation = Orientation.NORTH;
-        }
+        this.orientation = rightRotation.rotate(orientation);
     }
     
     public Integer getPositionX() {
-    	return this.positionX;
+        return this.positionX;
     }
     
     public Integer getPositionY() {
-    	return this.positionY;
+        return this.positionY;
     }
     
     public void afficherPosition() {
-    	System.out.println("x = " + this.positionX + " y = " + this.positionY);
+        System.out.println("x = " + this.positionX + " y = " + this.positionY);
     }
-    
-    private Boolean isValid(ArrayList<Obstacle> obstacles, Boolean isValid, Integer positionX, Integer positionY) {
-		for (Obstacle obstacle: obstacles) {
-			if (obstacle.getPositionX().equals(positionX) && obstacle.getPositionY().equals(positionY)) {
-				isValid = false;
-			}
-		}
-		return isValid;
-	}
     
     public void isOnTheEdge() {
-    	if (this.getPositionX() == 51) {
-    		this.positionX = -50;
-    	} else if (this.getPositionX() == -51){
-    		this.positionX = 50;
-    	}
-    	if (this.getPositionY() == 51) {
-    		this.positionX = -50;
-    	} else if (this.getPositionY() == -51){
-    		this.positionX = 50;
-    	}
+        Position wrappedPosition = gridWrapper.wrapPosition(new Position(positionX, positionY));
+        this.positionX = wrappedPosition.getX();
+        this.positionY = wrappedPosition.getY();
     }
-    
 }
