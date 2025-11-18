@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 public class Rover {
-	private Orientation orientation = Orientation.NORTH;
+	Orientation orientation = Orientation.NORTH;
 	private Integer positionX = 0;
 	private Integer positionY = 0;
 	
@@ -93,11 +93,11 @@ public class Rover {
         }
     }
     
-    private Integer getPositionX() {
+    public Integer getPositionX() {
     	return this.positionX;
     }
     
-    private Integer getPositionY() {
+    public Integer getPositionY() {
     	return this.positionY;
     }
     
@@ -107,7 +107,7 @@ public class Rover {
     
     private Boolean isValid(ArrayList<Obstacle> obstacles, Boolean isValid, Integer positionX, Integer positionY) {
 		for (Obstacle obstacle: obstacles) {
-			if (Obstacle.getPositionX() == positionX && Obstacle.getPositionY() == positionY) {
+			if (obstacle.getPositionX().equals(positionX) && obstacle.getPositionY().equals(positionY)) {
 				isValid = false;
 			}
 		}
