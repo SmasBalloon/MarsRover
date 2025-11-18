@@ -1,18 +1,18 @@
 
 public class Obstacle {
-	private static Integer positionX;
-	private static Integer positionY;
+	private Integer positionX;
+	private Integer positionY;
 
 	public Obstacle(Integer positionX, Integer positionY) {
 		this.positionX = positionX;
 		this.positionY = positionY;
 	}
 
-	public static Integer getPositionX() {
+	public Integer getPositionX() {
 		return positionX;
 	}
 
-	public static Integer getPositionY() {
+	public Integer getPositionY() {
 		return positionY;
 	}
 }
